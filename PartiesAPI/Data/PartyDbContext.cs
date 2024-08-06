@@ -15,11 +15,17 @@ namespace PartiesAPI.Data
         {
             var usersTable = modelBuilder.Entity<User>();
             usersTable.HasKey(u => u.Id);
-            usersTable.Property(u => new { u.FirstName, u.LastName, u.Email }).IsRequired();
+            usersTable.Property(u => u.FirstName).IsRequired();
+            usersTable.Property(u => u.LastName).IsRequired();
+            usersTable.Property(u => u.Email).IsRequired();
 
             var eventsTable = modelBuilder.Entity<Event>();
             eventsTable.HasKey(e => e.Id);
-            eventsTable.Property(e => new {e.Name, e.Location, e.StartTime, e.EndTime, e.Organizer}).IsRequired();
+            eventsTable.Property(e => e.Name).IsRequired();
+            eventsTable.Property(e => e.Location).IsRequired();
+            eventsTable.Property(e => e.StartTime).IsRequired();
+            eventsTable.Property(e => e.EndTime).IsRequired();
+            eventsTable.Property(e => e.Organizer).IsRequired();
             eventsTable.HasMany(e => e.Participants);
         }
     }
