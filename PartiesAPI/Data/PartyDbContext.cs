@@ -23,8 +23,8 @@ namespace PartiesAPI.Data
             eventsTable.HasKey(e => e.Id);
             eventsTable.Property(e => e.Name).IsRequired();
             eventsTable.Property(e => e.Location).IsRequired();
-            eventsTable.Property(e => e.StartTime).IsRequired();
-            eventsTable.Property(e => e.EndTime).IsRequired();
+            eventsTable.Property(e => e.StartTime).IsRequired().HasColumnType("datetime");
+            eventsTable.Property(e => e.EndTime).IsRequired().HasColumnType("datetime");
             eventsTable.Property(e => e.Organizer).IsRequired();
             eventsTable.HasMany(e => e.Participants);
         }
