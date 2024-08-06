@@ -31,5 +31,19 @@ namespace PartiesAPI.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet("{id}")]
+        public IActionResult GetEventById(int id)
+        {
+            var searchedEvent = _context.Events.SingleOrDefault(e => e.Id == id);
+
+            if (searchedEvent == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(searchedEvent);
+        }
+
     }
 }
