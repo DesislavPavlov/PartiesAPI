@@ -27,6 +27,8 @@ namespace PartiesAPI.Data
             eventsTable.Property(e => e.EndTime).HasColumnType("datetime").IsRequired();
             eventsTable.Property(e => e.Organizer).IsRequired();
             eventsTable.HasMany(e => e.Participants);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
