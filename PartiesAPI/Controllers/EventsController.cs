@@ -45,5 +45,19 @@ namespace PartiesAPI.Controllers
             return Ok(searchedEvent);
         }
 
+        [HttpPut("{id}/joinevent/{userId}")]
+        public IActionResult JoinEventByUserId(int id, int userId)
+        {
+            var evnt = _context.Events.SingleOrDefault(ev => ev.Id == id);
+            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+
+            if (user == null || evnt == null)
+            {
+                return NotFound();
+            }
+
+            evnt.Participants.Add(user);
+            return Ok(evnt);
+        }
     }
 }
