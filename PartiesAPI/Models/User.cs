@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PartiesAPI.Models
 {
@@ -14,6 +15,9 @@ namespace PartiesAPI.Models
 
         [Required]
         public string? Email { get; set; }
+
+        [JsonIgnore]
+        public IEnumerable<Event>? Events { get; set; }
 
     }
 }

@@ -20,7 +20,7 @@ namespace PartiesAPI.Data
             var eventsTable = modelBuilder.Entity<Event>();
             eventsTable.HasKey(e => e.Id);
             eventsTable.Property(e => new {e.Name, e.Location, e.StartTime, e.EndTime, e.Organizer}).IsRequired();
-            eventsTable.HasMany(e => e.Participants);
+            eventsTable.HasMany(e => e.Participants).WithMany(u => u.Events);
         }
     }
 }
