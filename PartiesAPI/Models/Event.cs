@@ -22,7 +22,7 @@ namespace PartiesAPI.Models
         public DateTime EndTime { get; set;}
 
         [Required]
-        public string Organizer { get; set; }
+        public int OrganizerId { get; set; }
 
         public ICollection<User>? Participants { get; set; }
     }
