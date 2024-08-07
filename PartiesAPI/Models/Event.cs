@@ -24,6 +24,6 @@ namespace PartiesAPI.Models
         [Required]
         public int OrganizerId { get; set; }
 
-        public ICollection<User>? Participants { get; set; }
+        public ICollection<int>? ParticipantIds { get; set; }
     }
 }
