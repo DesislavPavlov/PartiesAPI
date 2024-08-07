@@ -17,7 +17,7 @@ namespace PartiesAPI.Models
         public string? Email { get; set; }
 
         [JsonIgnore]
-        public IEnumerable<Event>? Events { get; set; }
+        public ICollection<Event>? Events { get; set; }
 
     }
 }
