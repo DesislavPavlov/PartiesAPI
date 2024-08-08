@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PartiesAPI.Models
 {
@@ -24,6 +25,9 @@ namespace PartiesAPI.Models
         [Required]
         public int OrganizerId { get; set; }
 
-        public ICollection<int>? ParticipantIds { get; set; }
+        [ForeignKey("OrganizerId")]
+        public User Organizer { get; set; }
+
+        public ICollection<User>? Participants { get; set; }
     }
 }
