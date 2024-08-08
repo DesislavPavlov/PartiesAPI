@@ -19,6 +19,7 @@ namespace PartiesAPI.Data
             usersTable.Property(u => u.FirstName).IsRequired();
             usersTable.Property(u => u.LastName).IsRequired();
             usersTable.Property(u => u.Email).IsRequired();
+            usersTable.HasIndex(u => u.Email).IsUnique();
 
             var eventsTable = modelBuilder.Entity<Event>();
             eventsTable.HasKey(e => e.Id);
