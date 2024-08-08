@@ -6,7 +6,7 @@ namespace PartiesAPI.Models
     public class EventParticipant
     {
         [Key] 
-        public int Id { get; set; }
+        public int EventParticipantId { get; set; }
 
         [Required]
         public int EventId { get; set; }
