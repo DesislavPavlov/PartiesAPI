@@ -27,7 +27,5 @@ namespace PartiesAPI.Models
 
         [ForeignKey("OrganizerId")]
         public User Organizer { get; set; }
-
-        public ICollection<User>? Participants { get; set; }
     }
 }

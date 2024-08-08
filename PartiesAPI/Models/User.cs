@@ -18,10 +18,5 @@ namespace PartiesAPI.Models
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-
-        public ICollection<Event> OrganizedEvents { get; set; }
-
-        public ICollection<Event> Events { get; set; }
-
     }
 }
