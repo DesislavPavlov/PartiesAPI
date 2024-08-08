@@ -17,10 +17,10 @@ namespace PartiesAPI.Models
         public string Location { get; set; }
 
         [Required]
-        public DateTime StartTime { get; set;}
+        public DateTime StartDate { get; set;}
 
         [Required]
-        public DateTime EndTime { get; set;}
+        public DateTime EndDate { get; set;}
 
         [Required]
         public int OrganizerId { get; set; }

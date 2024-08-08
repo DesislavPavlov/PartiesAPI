@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PartiesAPI.Models
 {
-    public class EventUserJoin
+    public class EventParticipant
     {
         [Key] 
         public int Id { get; set; }
@@ -21,6 +21,6 @@ namespace PartiesAPI.Models
         public User User { get; set; }
 
         [Required]
-        public DateTime JoinTime { get; set; }
+        public DateTime JoinDate { get; set; }
     }
 }
