@@ -5,19 +5,20 @@ namespace PartiesAPI.Models
 {
     public class User
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
-        public string? FirstName { get; set; }
+        [MaxLength(100)]
+        public string FirstName { get; set; }
 
         [Required]
-        public string? LastName { get; set; }
+        [MaxLength(100)]
+        public string LastName { get; set; }
 
         [Required]
-        public string? Email { get; set; }
-
-        [JsonIgnore]
-        public ICollection<Event>? Events { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
 
     }
 }

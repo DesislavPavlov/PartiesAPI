@@ -1,26 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PartiesAPI.Models
 {
     public class Event
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
-        public string? Name { get; set; }
+        [MaxLength(100)]
+        public string Name { get; set; }
 
         [Required]
-        public string? Location { get; set; }
+        [MaxLength(100)]
+        public string Location { get; set; }
 
         [Required]
-        public DateTime StartTime { get; set;}
+        public DateTime StartDate { get; set;}
 
         [Required]
-        public DateTime EndTime { get; set;}
+        public DateTime EndDate { get; set;}
 
         [Required]
-        public string? Organizer { get; set; }
+        public int OrganizerId { get; set; }
 
-        public ICollection<User>? Participants { get; set; }
+        [ForeignKey("OrganizerId")]
+        public User Organizer { get; set; }
     }
 }
