@@ -37,6 +37,7 @@ namespace PartiesAPI.Data
             eventParticipantsTable.Property(ep => ep.EventId).IsRequired();
             eventParticipantsTable.HasOne(ep => ep.User).WithMany().HasForeignKey(ep => ep.UserId);
             eventParticipantsTable.HasOne(ep => ep.Event).WithMany().HasForeignKey(ep => ep.EventId);
+            eventParticipantsTable.Property(ep => ep.JoinDate).HasColumnType("datetime").IsRequired();
 
             base.OnModelCreating(modelBuilder);
         }
