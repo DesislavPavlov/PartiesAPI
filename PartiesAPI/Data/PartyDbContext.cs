@@ -30,12 +30,14 @@ namespace PartiesAPI.Data
             eventsTable.Property(e => e.OrganizerId).IsRequired();
             eventsTable.HasOne(e => e.Organizer).WithOne().HasForeignKey<Event>(e => e.OrganizerId);
 
+
             var eventParticipantsTable = modelBuilder.Entity<EventParticipant>();
             eventParticipantsTable.HasKey(ep => ep.EventParticipantId);
             eventParticipantsTable.Property(ep => ep.UserId).IsRequired();
             eventParticipantsTable.Property(ep => ep.EventId).IsRequired();
             eventParticipantsTable.HasOne(ep => ep.User).WithMany().HasForeignKey(ep => ep.UserId);
             eventParticipantsTable.HasOne(ep => ep.Event).WithMany().HasForeignKey(ep => ep.EventId);
+            eventParticipantsTable.HasIndex(ep => new { ep.EventId, ep.IsOrganizer }).IsUnique().HasFilter("[IsOrganizer] = 1");
 
             base.OnModelCreating(modelBuilder);
         }
