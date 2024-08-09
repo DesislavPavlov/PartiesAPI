@@ -10,7 +10,6 @@ namespace PartiesAPI.Models
         public Event Event { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }
-        public bool IsOrganizer { get; set; }
         public DateTime JoinDate { get; set; }
     }
 }
