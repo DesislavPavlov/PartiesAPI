@@ -28,7 +28,7 @@ namespace PartiesAPI.Data
             eventsTable.Property(e => e.StartDate).HasColumnType("datetime").IsRequired();
             eventsTable.Property(e => e.EndDate).HasColumnType("datetime").IsRequired();
             eventsTable.Property(e => e.OrganizerId).IsRequired();
-            eventsTable.HasOne(e => e.Organizer).WithMany(u => u.OrganiziedEvents).HasForeignKey(e => e.OrganizerId);
+            eventsTable.HasOne(e => e.Organizer).WithMany(u => u.OrganizedEvents).HasForeignKey(e => e.OrganizerId).OnDelete(DeleteBehavior.Restrict);
 
 
             var eventParticipantsTable = modelBuilder.Entity<EventParticipant>();
