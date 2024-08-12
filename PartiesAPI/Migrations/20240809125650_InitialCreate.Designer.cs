@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PartiesAPI.Data;
 
@@ -10,9 +11,10 @@ using PartiesAPI.Data;
 namespace PartiesAPI.Migrations
 {
     [DbContext(typeof(PartyDbContext))]
-    partial class PartyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240809125650_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,9 +108,9 @@ namespace PartiesAPI.Migrations
             modelBuilder.Entity("PartiesAPI.Models.Event", b =>
                 {
                     b.HasOne("PartiesAPI.Models.User", "Organizer")
-                        .WithMany("OrganizedEvents")
+                        .WithMany("OrganiziedEvents")
                         .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Organizer");
@@ -135,7 +137,7 @@ namespace PartiesAPI.Migrations
 
             modelBuilder.Entity("PartiesAPI.Models.User", b =>
                 {
-                    b.Navigation("OrganizedEvents");
+                    b.Navigation("OrganiziedEvents");
                 });
 #pragma warning restore 612, 618
         }

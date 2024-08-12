@@ -9,24 +9,35 @@ namespace PartiesAPI.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<EventParticipant> EventParticipants { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var usersTable = modelBuilder.Entity<User>();
-            usersTable.HasKey(u => u.Id);
-            usersTable.Property(u => u.FirstName).IsRequired();
-            usersTable.Property(u => u.LastName).IsRequired();
+            usersTable.HasKey(u => u.UserId);
+            usersTable.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
+            usersTable.Property(u => u.LastName).HasMaxLength(100).IsRequired();
             usersTable.Property(u => u.Email).IsRequired();
+            usersTable.HasIndex(u => u.Email).IsUnique();
 
             var eventsTable = modelBuilder.Entity<Event>();
-            eventsTable.HasKey(e => e.Id);
-            eventsTable.Property(e => e.Name).IsRequired();
-            eventsTable.Property(e => e.Location).IsRequired();
-            eventsTable.Property(e => e.StartTime).HasColumnType("datetime").IsRequired();
-            eventsTable.Property(e => e.EndTime).HasColumnType("datetime").IsRequired();
-            eventsTable.Property(e => e.Organizer).IsRequired();
-            eventsTable.HasMany(e => e.Participants);
+            eventsTable.HasKey(e => e.EventId);
+            eventsTable.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            eventsTable.Property(e => e.Location).HasMaxLength(100).IsRequired();
+            eventsTable.Property(e => e.StartDate).HasColumnType("datetime").IsRequired();
+            eventsTable.Property(e => e.EndDate).HasColumnType("datetime").IsRequired();
+            eventsTable.Property(e => e.OrganizerId).IsRequired();
+            eventsTable.HasOne(e => e.Organizer).WithMany(u => u.OrganizedEvents).HasForeignKey(e => e.OrganizerId).OnDelete(DeleteBehavior.Restrict);
+
+
+            var eventParticipantsTable = modelBuilder.Entity<EventParticipant>();
+            eventParticipantsTable.HasKey(ep => ep.EventParticipantId);
+            eventParticipantsTable.Property(ep => ep.UserId).IsRequired();
+            eventParticipantsTable.Property(ep => ep.EventId).IsRequired();
+            eventParticipantsTable.HasOne(ep => ep.User).WithMany().HasForeignKey(ep => ep.UserId);
+            eventParticipantsTable.HasOne(ep => ep.Event).WithMany().HasForeignKey(ep => ep.EventId);
+            eventParticipantsTable.Property(ep => ep.JoinDate).HasColumnType("datetime").IsRequired();
 
             base.OnModelCreating(modelBuilder);
         }
