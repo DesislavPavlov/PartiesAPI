@@ -18,27 +18,41 @@ namespace PartiesAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<UserDTO>> GetAllUsers()
         {
-            var users = await _service.GetAllUsers();
-
-            if (users == null)
+            try
             {
-                return NotFound("There are no users in the database currently!");
-            }
+                var users = await _service.GetAllUsers();
 
-            return Ok(users);
+                if (users == null)
+                {
+                    return NotFound("There are no users in the database currently!");
+                }
+
+                return Ok(users);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserById(int id)
         {
-            var user = await _service.GetUserById(id);
-
-            if (user == null)
+            try
             {
-                return NotFound("User with ID of '{id}' does not exist!");
-            }
+                var user = await _service.GetUserById(id);
 
-            return Ok(user);
+                if (user == null)
+                {
+                    return NotFound("User with ID of '{id}' does not exist!");
+                }
+
+                return Ok(user);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpPost]
@@ -49,22 +63,36 @@ namespace PartiesAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _service.CreateUser(userDTO);
+            try
+            {
+                var user = await _service.CreateUser(userDTO);
 
-            return Ok(user);
+                return Ok(user);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(int id)
         {
-            var deletionSuccessful = await _service.DeleteUser(id);
-
-            if (!deletionSuccessful)
+            try
             {
-                return BadRequest($"Either user with ID of '{id}' does not exist, or the user is an organizer of an event!");
-            }
+                var deletionSuccessful = await _service.DeleteUser(id);
 
-            return NoContent();
+                if (!deletionSuccessful)
+                {
+                    return BadRequest($"Either user with ID of '{id}' does not exist, or the user is an organizer of an event!");
+                }
+
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

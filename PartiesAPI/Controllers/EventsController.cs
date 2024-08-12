@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Security;
 using PartiesAPI.DTO;
 using PartiesAPI.Models;
@@ -26,42 +27,63 @@ namespace PartiesAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            UserDTO organizer = await _service.GetUserById(eventDTO.OrganizerId);
-
-            if (organizer == null)
+            try
             {
-                return BadRequest("Organizer does not exist!");
+                UserDTO organizer = await _service.GetUserById(eventDTO.OrganizerId);
+
+                if (organizer == null)
+                {
+                    return BadRequest("Organizer does not exist!");
+                }
+
+                var @event = await _service.CreateEvent(eventDTO);
+
+                return Ok(@event);
             }
-
-            var @event = await _service.CreateEvent(eventDTO);
-
-            return Ok(@event);
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EventDTO>> GetEventById(int id)
         {
-            var @event = await _service.GetEventById(id);
-
-            if (@event == null)
+            try
             {
-                return BadRequest($"Event with ID of '{id}' does not exist!");
-            }
+                var @event = await _service.GetEventById(id);
 
-            return Ok(@event);
+                if (@event == null)
+                {
+                    return BadRequest($"Event with ID of '{id}' does not exist!");
+                }
+
+                return Ok(@event);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpPost("{id}/joinevent/{userId}")]
         public async Task<ActionResult<EventDTO>> JoinEvent(int id, int userId)
         {
-            var eventParticipant = await _service.JoinEvent(id, userId);
-
-            if (eventParticipant == null)
+            try
             {
-                return BadRequest($"Either an event with ID of '{id}' or a user with ID of '{userId}' does not exist!");
-            }
+                var eventParticipant = await _service.JoinEvent(id, userId);
 
-            return Ok(eventParticipant);
+                if (eventParticipant == null)
+                {
+                    return BadRequest($"Either an event with ID of '{id}' or a user with ID of '{userId}' does not exist!");
+                }
+
+                return Ok(eventParticipant);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
     }
 }
