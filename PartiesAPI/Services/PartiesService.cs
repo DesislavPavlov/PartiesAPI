@@ -29,14 +29,20 @@ namespace PartiesAPI.Services
             };
 
             await _context.Events.AddAsync(@event);
+
             await _context.SaveChangesAsync();
+            
             return eventDTO;
         }
+
         public async Task<EventDTO> GetEventById(int id)
         {
             var @event = await _context.Events.SingleOrDefaultAsync(e => e.EventId == id);
+
             if (@event == null)
+            {
                 return null;
+            }
 
             EventDTO @eventDto = new EventDTO()
             {
@@ -50,12 +56,17 @@ namespace PartiesAPI.Services
 
             return @eventDto;
         }
+
         public async Task<EventParticipantDTO> JoinEvent(int eventId, int userId)
         {
             bool eventExists = await _context.Events.AnyAsync(e => e.EventId == eventId);
+
             bool userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
+            
             if (!eventExists || !userExists)
+            {
                 return null;
+            }
 
             EventParticipant eventParticipant = new EventParticipant()
             {
@@ -72,9 +83,10 @@ namespace PartiesAPI.Services
             };
 
             await _context.EventParticipants.AddAsync(eventParticipant);
-            await _context.SaveChangesAsync();
-            return eventParticipantDTO;
 
+            await _context.SaveChangesAsync();
+            
+            return eventParticipantDTO;
         }
         
 
@@ -82,10 +94,14 @@ namespace PartiesAPI.Services
         public async Task<List<UserDTO>> GetAllUsers()
         {
             List<User> users = await _context.Users.Include(u => u.OrganizedEvents).ToListAsync();
+
             if (users == null || users.Count == 0)
+            {
                 return null;
+            }
 
             List<UserDTO> userDTOs = new List<UserDTO>();
+
             foreach (var user in users)
             {
                 UserDTO userDTO = new UserDTO()
@@ -105,6 +121,7 @@ namespace PartiesAPI.Services
         public async Task<UserDTO> GetUserById(int id)
         {
             var user = await _context.Users.Include(u => u.OrganizedEvents).SingleOrDefaultAsync(u => u.UserId == id);
+
             UserDTO userDTO = new UserDTO()
             {
                 UserId = user.UserId,
@@ -128,14 +145,19 @@ namespace PartiesAPI.Services
             };
 
             await _context.Users.AddAsync(user);
+            
             await _context.SaveChangesAsync();
+            
             return userDTO;
         }
         public async Task<bool> DeleteUser(int id)
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.UserId == id);
+
             if (user == null)
+            {
                 return false;
+            }
 
             try
             {
