@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Security;
-using PartiesAPI.Data;
+using PartiesAPI.DTO;
 using PartiesAPI.Models;
+using PartiesAPI.Services;
 
 namespace PartiesAPI.Controllers
 {
@@ -10,54 +11,60 @@ namespace PartiesAPI.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private PartyDbContext _context;
+        private readonly PartiesService _service;
 
-        public EventsController(PartyDbContext context)
+        public EventsController(PartiesService service)
         {
-            _context = context;
+            _service = service;
         }
 
         [HttpPost]
-        public IActionResult CreateEvent(Event ev)
+        public async Task<ActionResult<EventDTO>> CreateEvent([FromBody] EventDTO eventDTO)
         {
-            try
-            {
-                _context.Events.Add(ev);
-                _context.SaveChanges();
-                return Ok(ev);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            UserDTO organizer = await _service.GetUserById(eventDTO.OrganizerId);
+            if (organizer == null) 
+                return BadRequest("Organizer does not exist!");
+
+            var @event = await _service.CreateEvent(eventDTO);
+            return Ok(@event);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetEventById(int id)
+        public async Task<ActionResult<EventDTO>> GetEventById(int id)
         {
-            var searchedEvent = _context.Events.SingleOrDefault(e => e.Id == id);
+            var @event = await _service.GetEventById(id);
+            if (@event == null)
+                return BadRequest($"Event with ID of '{id}' does not exist!");
 
-            if (searchedEvent == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(searchedEvent);
+            return Ok(@event);
         }
 
-        [HttpPut("{id}/joinevent/{userId}")]
-        public IActionResult JoinEventByUserId(int id, int userId)
+        [HttpPost("{id}/joinevent/{userId}")]
+        public async Task<ActionResult<EventDTO>> JoinEvent(int id, int userId)
         {
-            var evnt = _context.Events.SingleOrDefault(ev => ev.Id == id);
-            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+            var eventParticipant = await _service.JoinEvent(id, userId);
+            if (eventParticipant == null)
+                return BadRequest($"Either an event with ID of '{id}' or a user with ID of '{userId}' does not exist!");
 
-            if (user == null || evnt == null)
-            {
-                return NotFound();
-            }
-
-            evnt.Participants.Add(user);
-            return Ok(evnt);
+            return Ok(eventParticipant);
         }
+
+        //[HttpPut("{id}/joinevent/{userId}")]
+        //public IActionResult JoinEventByUserId(int id, int userId)
+        //{
+        //    var evnt = _context.Events.SingleOrDefault(ev => ev.Id == id);
+        //    var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+
+        //    if (user == null || evnt == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    evnt.Participants.Add(user);
+        //    return Ok(evnt);
+        //}
     }
 }
