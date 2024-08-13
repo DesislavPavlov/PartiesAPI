@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Mysqlx.Session;
+using MySqlX.XDevAPI.Common;
 using PartiesAPI.DTO;
+using PartiesAPI.Exceptions;
 using PartiesAPI.Services;
 
 namespace PartiesAPI.Controllers
@@ -18,81 +21,93 @@ namespace PartiesAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<UserDTO>> GetAllUsers()
         {
+            ActionResult result;
+
             try
             {
                 var users = await _service.GetAllUsers();
 
-                if (users == null)
-                {
-                    return NotFound("There are no users in the database currently!");
-                }
-
-                return Ok(users);
+                result = Ok(users);
             }
-            catch (Exception)
+            catch (DatabaseOperationException ex)
             {
-                return StatusCode(500);
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+
+            return result;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserById(int id)
         {
+            ActionResult result;
+
             try
             {
                 var user = await _service.GetUserById(id);
 
-                if (user == null)
-                {
-                    return NotFound("User with ID of '{id}' does not exist!");
-                }
-
-                return Ok(user);
+                result = Ok(user);
             }
-            catch (Exception)
+            catch (NotFoundException ex)
             {
-                return StatusCode(500);
+                result = NotFound(ex.Message);
             }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
         }
 
         [HttpPost]
         public async Task<ActionResult<UserDTO>> CreateUser([FromBody] UserDTO userDTO)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            ActionResult result;
 
             try
             {
                 var user = await _service.CreateUser(userDTO);
 
-                return Ok(user);
+                result = Ok(user);
             }
-            catch (Exception)
+            catch (BadHttpRequestException ex)
             {
-                return StatusCode(500);
+                result = BadRequest(ex.Message);
             }
+            catch (InvalidOperationException ex)
+            {
+                result = Conflict(ex.Message);
+            }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(int id)
         {
+            ActionResult result;
+
             try
             {
-                var deletionSuccessful = await _service.DeleteUser(id);
+                await _service.DeleteUser(id);
 
-                if (!deletionSuccessful)
-                {
-                    return BadRequest($"Either user with ID of '{id}' does not exist, or the user is an organizer of an event!");
-                }
-
-                return NoContent();
+                result = NoContent();
             }
-            catch (Exception)
+            catch (NotFoundException ex)
             {
-                return StatusCode(500);
+                result = NotFound(ex.Message);
             }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
         }
     }
 }

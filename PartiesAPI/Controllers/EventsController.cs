@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Security;
 using PartiesAPI.DTO;
+using PartiesAPI.Exceptions;
 using PartiesAPI.Models;
 using PartiesAPI.Services;
 
@@ -22,68 +23,78 @@ namespace PartiesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<EventDTO>> CreateEvent([FromBody] EventDTO eventDTO)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            ActionResult result;
 
             try
             {
-                UserDTO organizer = await _service.GetUserById(eventDTO.OrganizerId);
-
-                if (organizer == null)
-                {
-                    return BadRequest("Organizer does not exist!");
-                }
-
                 var @event = await _service.CreateEvent(eventDTO);
 
-                return Ok(@event);
+                result = Ok(@event);
             }
-            catch (Exception)
+            catch (BadHttpRequestException ex)
             {
-                return StatusCode(500);
+                result = BadRequest(ex.Message);
             }
+            catch (NotFoundException ex)
+            {
+                result = NotFound(ex.Message);
+            }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EventDTO>> GetEventById(int id)
         {
+            ActionResult result;
+
             try
             {
                 var @event = await _service.GetEventById(id);
 
-                if (@event == null)
-                {
-                    return BadRequest($"Event with ID of '{id}' does not exist!");
-                }
-
-                return Ok(@event);
+                result = Ok(@event);
             }
-            catch (Exception)
+            catch (NotFoundException ex)
             {
-                return StatusCode(500);
+                result = NotFound(ex.Message);
             }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
         }
 
-        [HttpPost("{id}/joinevent/{userId}")]
-        public async Task<ActionResult<EventDTO>> JoinEvent(int id, int userId)
+        [HttpPost("{eventId}/joinevent/{userId}")]
+        public async Task<ActionResult<EventDTO>> JoinEvent(int eventId, int userId)
         {
+            ActionResult result;
+
             try
             {
-                var eventParticipant = await _service.JoinEvent(id, userId);
+                var eventParticipant = await _service.JoinEvent(eventId, userId);
 
-                if (eventParticipant == null)
-                {
-                    return BadRequest($"Either an event with ID of '{id}' or a user with ID of '{userId}' does not exist!");
-                }
-
-                return Ok(eventParticipant);
+                result = Ok(eventParticipant);
             }
-            catch (Exception)
+            catch (NotFoundException ex)
             {
-                return StatusCode(500);
+                result = NotFound(ex.Message);
             }
+            catch (InvalidOperationException ex)
+            {
+                result = Conflict(ex.Message);
+            }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
         }
     }
 }
