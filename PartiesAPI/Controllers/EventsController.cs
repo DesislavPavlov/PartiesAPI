@@ -13,9 +13,9 @@ namespace PartiesAPI.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly PartiesService _service;
+        private readonly EventService _service;
 
-        public EventsController(PartiesService service)
+        public EventsController(EventService service)
         {
             _service = service;
         }

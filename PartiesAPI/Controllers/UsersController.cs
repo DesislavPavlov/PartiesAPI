@@ -12,8 +12,8 @@ namespace PartiesAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly PartiesService _service;
-        public UsersController(PartiesService service)
+        private readonly UserService _service;
+        public UsersController(UserService service)
         {
             _service = service;
         }
