@@ -1,21 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PartiesAPI.Data;
 using PartiesAPI.DTO;
+using PartiesAPI.DTOMappers;
 using PartiesAPI.Exceptions;
 using PartiesAPI.Models;
+using PartiesAPI.Services.UserService;
 using PartiesAPI.Utils;
 
-namespace PartiesAPI.Services
+namespace PartiesAPI.Services.EventService
 {
-    public class EventService
+    public class EventService : IEventService
     {
         private readonly PartyDbContext _context;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
+        private readonly EventMapper _mapper;
 
-        public EventService(PartyDbContext context, UserService userService)
+        public EventService(PartyDbContext context, IUserService userService, EventMapper mapper)
         {
             _context = context;
             _userService = userService;
+            _mapper = mapper;
         }
 
         public async Task<EventDTO> CreateEvent(EventDTO eventDTO)
@@ -24,8 +28,8 @@ namespace PartiesAPI.Services
             if (
                 string.IsNullOrEmpty(eventDTO.Name) ||
                 string.IsNullOrEmpty(eventDTO.Location) ||
-                eventDTO.StartDate == default(DateTime) ||
-                eventDTO.EndDate == default(DateTime) ||
+                eventDTO.StartDate == default ||
+                eventDTO.EndDate == default ||
                 eventDTO.OrganizerId == 0
                )
             {
@@ -36,14 +40,7 @@ namespace PartiesAPI.Services
             await _userService.GetUserById(eventDTO.OrganizerId);
 
             // Create & save event
-            Event @event = new Event()
-            {
-                Name = eventDTO.Name,
-                Location = eventDTO.Location,
-                StartDate = eventDTO.StartDate,
-                EndDate = eventDTO.EndDate,
-                OrganizerId = eventDTO.OrganizerId,
-            };
+            Event @event = _mapper.ToEvent(eventDTO);
 
             try
             {
@@ -79,15 +76,7 @@ namespace PartiesAPI.Services
             }
 
             // Make an eventDTO to return to user
-            EventDTO @eventDto = new EventDTO()
-            {
-                EventId = @event.EventId,
-                Name = @event.Name,
-                Location = @event.Location,
-                StartDate = @event.StartDate,
-                EndDate = @event.EndDate,
-                OrganizerId = @event.OrganizerId,
-            };
+            EventDTO @eventDto = _mapper.ToDTO(@event);
 
             return @eventDto;
         }

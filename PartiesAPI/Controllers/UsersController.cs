@@ -4,7 +4,7 @@ using Mysqlx.Session;
 using MySqlX.XDevAPI.Common;
 using PartiesAPI.DTO;
 using PartiesAPI.Exceptions;
-using PartiesAPI.Services;
+using PartiesAPI.Services.UserService;
 
 namespace PartiesAPI.Controllers
 {
@@ -12,8 +12,8 @@ namespace PartiesAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserService _service;
-        public UsersController(UserService service)
+        private readonly IUserService _service;
+        public UsersController(IUserService service)
         {
             _service = service;
         }

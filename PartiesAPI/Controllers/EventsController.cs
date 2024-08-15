@@ -5,7 +5,7 @@ using Org.BouncyCastle.Security;
 using PartiesAPI.DTO;
 using PartiesAPI.Exceptions;
 using PartiesAPI.Models;
-using PartiesAPI.Services;
+using PartiesAPI.Services.EventService;
 
 namespace PartiesAPI.Controllers
 {
@@ -13,9 +13,9 @@ namespace PartiesAPI.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly EventService _service;
+        private readonly IEventService _service;
 
-        public EventsController(EventService service)
+        public EventsController(IEventService service)
         {
             _service = service;
         }

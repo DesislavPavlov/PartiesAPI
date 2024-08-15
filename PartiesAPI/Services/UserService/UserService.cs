@@ -1,22 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PartiesAPI.Data;
 using PartiesAPI.DTO;
+using PartiesAPI.DTOMappers;
 using PartiesAPI.Exceptions;
 using PartiesAPI.Models;
 using PartiesAPI.Utils;
 using System.Text.RegularExpressions;
 
-namespace PartiesAPI.Services
+namespace PartiesAPI.Services.UserService
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private static readonly Regex EmailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly PartyDbContext _context;
+        private readonly UserMapper _mapper;
 
-        public UserService(PartyDbContext context)
+        public UserService(PartyDbContext context, UserMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<List<UserDTO>> GetAllUsers()
@@ -38,14 +41,7 @@ namespace PartiesAPI.Services
 
             foreach (var user in users)
             {
-                UserDTO userDTO = new UserDTO()
-                {
-                    UserId = user.UserId,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    OrganizedEventIds = user.OrganizedEvents.Select(e => e.EventId).ToList(),
-                };
+                UserDTO userDTO = _mapper.ToDTO(user);
 
                 userDTOs.Add(userDTO);
             }
@@ -72,14 +68,7 @@ namespace PartiesAPI.Services
             }
 
             // Make userDTO to return
-            UserDTO userDTO = new UserDTO()
-            {
-                UserId = user.UserId,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                OrganizedEventIds = user.OrganizedEvents.Select(e => e.EventId).ToList(),
-            };
+            UserDTO userDTO = _mapper.ToDTO(user);
 
             return userDTO;
         }
@@ -98,16 +87,10 @@ namespace PartiesAPI.Services
             await ValidateEmail(userDTO.Email);
 
             // Create & save user
-            User user = new User()
-            {
-                FirstName = userDTO.FirstName,
-                LastName = userDTO.LastName,
-                Email = userDTO.Email,
-                OrganizedEvents = await _context.Events.Where(user => userDTO.OrganizedEventIds.Contains(user.EventId)).ToListAsync(),
-            };
-
             try
             {
+                User user = await _mapper.ToUserAsync(userDTO);
+
                 await _context.Users.AddAsync(user);
 
                 await _context.SaveChangesAsync();
