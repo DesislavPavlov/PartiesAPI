@@ -96,5 +96,28 @@ namespace PartiesAPI.Controllers
 
             return result;
         }
+
+        [HttpGet("{eventId}/participants")]
+        public async Task<ActionResult<List<EventParticipantDTO>>> GetEventParticipantsByEventId(int eventId)
+        {
+            ActionResult result;
+
+            try
+            {
+                List<EventParticipantDTO> eventParticipantDTOs = await _service.GetEventParticipantsByEventId(eventId);
+
+                result = Ok(eventParticipantDTOs);
+            }
+            catch (NotFoundException ex)
+            {
+                result = NotFound(ex.Message);
+            }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
+        }
     }
 }

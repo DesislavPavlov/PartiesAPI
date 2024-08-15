@@ -14,12 +14,14 @@ namespace PartiesAPI.Services.EventService
         private readonly PartyDbContext _context;
         private readonly IUserService _userService;
         private readonly EventMapper _mapper;
+        private readonly EventParticipantMapper _eventParticipantMapper;
 
-        public EventService(PartyDbContext context, IUserService userService, EventMapper mapper)
+        public EventService(PartyDbContext context, IUserService userService, EventMapper mapper, EventParticipantMapper eventParticipantMapper)
         {
             _context = context;
             _userService = userService;
             _mapper = mapper;
+            _eventParticipantMapper = eventParticipantMapper;
         }
 
         public async Task<EventDTO> CreateEvent(EventDTO eventDTO)
@@ -135,12 +137,7 @@ namespace PartiesAPI.Services.EventService
                 JoinDate = DateTime.UtcNow,
             };
 
-            EventParticipantDTO eventParticipantDTO = new EventParticipantDTO()
-            {
-                EventId = eventId,
-                UserId = userId,
-                JoinDate = DateTime.UtcNow,
-            };
+            EventParticipantDTO eventParticipantDTO = _eventParticipantMapper.ToDTO(eventParticipant);
 
             try
             {
@@ -154,6 +151,38 @@ namespace PartiesAPI.Services.EventService
             }
 
             return eventParticipantDTO;
+        }
+
+        public async Task<List<EventParticipantDTO>> GetEventParticipantsByEventId(int evendId)
+        {
+            // Get event participants
+            List<EventParticipant> eventParticipants;
+
+            try
+            {
+                await GetEventById(evendId);
+                eventParticipants = await _context.EventParticipants.Where(ep => ep.EventId == evendId).ToListAsync();
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException(ex.Message);
+            }
+            catch (Exception)
+            {
+                throw new DatabaseOperationException(ExceptionMessages.DatabaseError);
+            }
+
+            // Make eventpartcipantDTOs and return
+            List<EventParticipantDTO> eventParticipantsDTOs = new List<EventParticipantDTO>();
+
+            foreach (EventParticipant eventParticipant in eventParticipants)
+            {
+                EventParticipantDTO eventParticipantDTO = _eventParticipantMapper.ToDTO(eventParticipant);
+
+                eventParticipantsDTOs.Add(eventParticipantDTO);
+            }
+
+            return eventParticipantsDTOs;
         }
     }
 }

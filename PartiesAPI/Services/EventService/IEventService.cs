@@ -7,6 +7,6 @@ namespace PartiesAPI.Services.EventService
         public Task<EventDTO> CreateEvent(EventDTO eventDTO);
         public Task<EventDTO> GetEventById(int id);
         public Task<EventParticipantDTO> JoinEvent(int eventId, int userId);
-        //public Task<EventParticipantDTO> GetEventParticipants(int evendId);
+        public Task<List<EventParticipantDTO>> GetEventParticipantsByEventId(int evendId);
     }
 }
