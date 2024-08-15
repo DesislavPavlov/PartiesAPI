@@ -12,14 +12,12 @@ namespace PartiesAPI.Services.EventService
     public class EventService : IEventService
     {
         private readonly PartyDbContext _context;
-        private readonly IUserService _userService;
         private readonly EventMapper _mapper;
         private readonly EventParticipantMapper _eventParticipantMapper;
 
-        public EventService(PartyDbContext context, IUserService userService, EventMapper mapper, EventParticipantMapper eventParticipantMapper)
+        public EventService(PartyDbContext context, EventMapper mapper, EventParticipantMapper eventParticipantMapper)
         {
             _context = context;
-            _userService = userService;
             _mapper = mapper;
             _eventParticipantMapper = eventParticipantMapper;
         }
@@ -39,7 +37,10 @@ namespace PartiesAPI.Services.EventService
             }
 
             // Validate organizer
-            await _userService.GetUserById(eventDTO.OrganizerId);
+            if (await _context.Users.AnyAsync(u => u.UserId == eventDTO.OrganizerId) == false)
+            {
+                throw new NotFoundException(string.Format(ExceptionMessages.UserNotFound, eventDTO.OrganizerId));
+            }
 
             // Create & save event
             Event @event = _mapper.ToEvent(eventDTO);
@@ -86,7 +87,7 @@ namespace PartiesAPI.Services.EventService
         public async Task<EventParticipantDTO> JoinEvent(int eventId, int userId)
         {
             // Validate event & user
-            // Check if user already joined
+            // Check if user already joined or organizer
             bool eventExists, userExists, userAlreadyParticipant, userAlreadyOrganizer;
 
             try
@@ -97,12 +98,7 @@ namespace PartiesAPI.Services.EventService
 
                 userAlreadyParticipant = await _context.EventParticipants.AnyAsync(ep => ep.EventId == eventId && ep.UserId == userId);
 
-                var user = await _userService.GetUserById(userId);
-                userAlreadyOrganizer = user.OrganizedEventIds.Any(id => id == eventId);
-            }
-            catch (NotFoundException ex)
-            {
-                throw new NotFoundException(ex.Message);
+                userAlreadyOrganizer = await _context.Users.AnyAsync(u => u.UserId == userId && u.OrganizedEvents.Select(e => e.EventId).Contains(eventId));
             }
             catch (Exception)
             {
@@ -183,6 +179,55 @@ namespace PartiesAPI.Services.EventService
             }
 
             return eventParticipantsDTOs;
+        }
+
+        public async Task ChangeOrganizer(int eventId, int userId)
+        {
+            // Validate event & user
+            // Check if user already organizer
+            bool eventExists, userExists, userAlreadyOrganizer;
+
+            try
+            {
+                eventExists = await _context.Events.AnyAsync(e => e.EventId == eventId);
+
+                userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
+
+                userAlreadyOrganizer = await _context.Users.AnyAsync(u => u.UserId == userId && u.OrganizedEvents.Select(e => e.EventId).Contains(eventId));
+            }
+            catch (Exception)
+            {
+                throw new DatabaseOperationException(ExceptionMessages.DatabaseError);
+            }
+
+            if (!eventExists)
+            {
+                throw new NotFoundException(string.Format(ExceptionMessages.EventNotFound, eventId));
+            }
+
+            if (!userExists)
+            {
+                throw new NotFoundException(string.Format(ExceptionMessages.UserNotFound, userId));
+            }
+
+            if (userAlreadyOrganizer)
+            {
+                throw new InvalidOperationException(string.Format(ExceptionMessages.UserAlreadyOrganizer, userId, eventId));
+            }
+
+            // Change event's organizerId and save
+            try
+            {
+                Event @event = await _context.Events.SingleOrDefaultAsync(e => e.EventId == eventId);
+
+                @event.OrganizerId = userId;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseOperationException(ExceptionMessages.DatabaseError);
+            }
         }
     }
 }

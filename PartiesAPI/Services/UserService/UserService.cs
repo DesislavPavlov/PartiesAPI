@@ -87,10 +87,10 @@ namespace PartiesAPI.Services.UserService
             await ValidateEmail(userDTO.Email);
 
             // Create & save user
+            User user = _mapper.ToUser(userDTO);
+
             try
             {
-                User user = await _mapper.ToUserAsync(userDTO);
-
                 await _context.Users.AddAsync(user);
 
                 await _context.SaveChangesAsync();

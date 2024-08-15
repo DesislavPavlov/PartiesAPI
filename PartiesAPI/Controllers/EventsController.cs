@@ -119,5 +119,32 @@ namespace PartiesAPI.Controllers
 
             return result;
         }
+
+        [HttpPut("{eventId}/organizer/{userId}")]
+        public async Task<ActionResult> ChangeOrganizer(int eventId, int  userId)
+        {
+            ActionResult result;
+
+            try
+            {
+                await _service.ChangeOrganizer(eventId, userId);
+
+                result = NoContent();
+            }
+            catch(NotFoundException ex)
+            {
+                result = NotFound(ex.Message);
+            }
+            catch(InvalidOperationException ex)
+            {
+                result = Conflict(ex.Message);
+            }
+            catch (DatabaseOperationException ex)
+            {
+                result = StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return result;
+        }
     }
 }

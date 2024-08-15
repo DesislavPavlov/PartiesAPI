@@ -7,13 +7,6 @@ namespace PartiesAPI.DTOMappers
 {
     public class UserMapper
     {
-        private readonly PartyDbContext _context;
-
-        public UserMapper(PartyDbContext context)
-        {
-            _context = context;
-        }
-
         public UserDTO ToDTO(User user)
         {
             return new UserDTO()
@@ -26,7 +19,7 @@ namespace PartiesAPI.DTOMappers
             };
         }
 
-        public async Task<User> ToUserAsync(UserDTO userDTO)
+        public User ToUser(UserDTO userDTO)
         {
             return new User()
             {
@@ -34,7 +27,6 @@ namespace PartiesAPI.DTOMappers
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Email = userDTO.Email,
-                OrganizedEvents = await _context.Events.Where(user => userDTO.OrganizedEventIds.Contains(user.EventId)).ToListAsync(),
             };
         }
     }
