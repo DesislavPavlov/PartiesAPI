@@ -10,6 +10,7 @@
         public const string UserAlreadyOrganizer = "User with ID {0} already organizes event with ID {1}!";
         public const string InvalidEmailFormat = "The provided email does not correspond to the correct format: example@domain.com!";
         public const string EmailTaken = "The provided email already exists!";
+        public const string CannotDeleteOrganizer = "User with ID {0} is an organizer of one or more event(s)! Please, remove all organization rights and try again!";
         public const string DatabaseError = "Something went wrong while trying to access the database, we will be fixing the problem ASAP! Please, try again later!";
     }
 }

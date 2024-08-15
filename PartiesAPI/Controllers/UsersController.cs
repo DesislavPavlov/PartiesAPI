@@ -61,13 +61,13 @@ namespace PartiesAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserDTO>> CreateUser([FromBody] UserDTO userDTO)
+        public async Task<ActionResult<UserDTO>> CreateUser([FromBody] UserCreateDTO userCreateDTO)
         {
             ActionResult result;
 
             try
             {
-                var user = await _service.CreateUser(userDTO);
+                var user = await _service.CreateUser(userCreateDTO);
 
                 result = Ok(user);
             }
@@ -101,6 +101,10 @@ namespace PartiesAPI.Controllers
             catch (NotFoundException ex)
             {
                 result = NotFound(ex.Message);
+            }
+            catch (OrganizerDeletionException ex)
+            {
+                result = Conflict(ex.Message);
             }
             catch (DatabaseOperationException ex)
             {

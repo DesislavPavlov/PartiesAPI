@@ -6,7 +6,7 @@ namespace PartiesAPI.Services.UserService
     {
         public Task<List<UserDTO>> GetAllUsers();
         public Task<UserDTO> GetUserById(int id);
-        public Task<UserDTO> CreateUser(UserDTO userDTO);
+        public Task<UserDTO> CreateUser(UserCreateDTO userDTO);
         public Task DeleteUser(int id);
     }
 }

@@ -15,18 +15,18 @@ namespace PartiesAPI.DTOMappers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                OrganizedEventIds = user.OrganizedEvents.Select(e => e.EventId).ToList()
+                OrganizedEventIds = user.OrganizedEvents.Select(e => e.EventId).ToList(),
             };
         }
 
-        public User ToUser(UserDTO userDTO)
+        public User ToUser(UserCreateDTO userDTO)
         {
             return new User()
             {
-                UserId = userDTO.UserId,
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Email = userDTO.Email,
+                OrganizedEvents = new List<Event>(),
             };
         }
     }

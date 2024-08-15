@@ -72,22 +72,22 @@ namespace PartiesAPI.Services.UserService
 
             return userDTO;
         }
-        public async Task<UserDTO> CreateUser(UserDTO userDTO)
+        public async Task<UserDTO> CreateUser(UserCreateDTO userCreateDTO)
         {
             // Validate model
             if (
-                string.IsNullOrEmpty(userDTO.FirstName) ||
-                string.IsNullOrEmpty(userDTO.LastName)
+                string.IsNullOrEmpty(userCreateDTO.FirstName) ||
+                string.IsNullOrEmpty(userCreateDTO.LastName)
                )
             {
                 throw new BadHttpRequestException(ExceptionMessages.InvalidUserModel);
             }
 
             // Validate email
-            await ValidateEmail(userDTO.Email);
+            await ValidateEmail(userCreateDTO.Email);
 
             // Create & save user
-            User user = _mapper.ToUser(userDTO);
+            User user = _mapper.ToUser(userCreateDTO);
 
             try
             {
@@ -100,7 +100,8 @@ namespace PartiesAPI.Services.UserService
                 throw new DatabaseOperationException(ExceptionMessages.DatabaseError);
             }
 
-            return userDTO;
+            // Return mapped to userDTO
+            return _mapper.ToDTO(user);
         }
         public async Task DeleteUser(int id)
         {
@@ -121,11 +122,16 @@ namespace PartiesAPI.Services.UserService
                 throw new NotFoundException(string.Format(ExceptionMessages.UserNotFound, id));
             }
 
-            // Delete user
+            // Delete user & save changes
+            _context.Users.Remove(user);
+
             try
             {
-                _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new OrganizerDeletionException(string.Format(ExceptionMessages.CannotDeleteOrganizer, id));
             }
             catch (Exception)
             {
