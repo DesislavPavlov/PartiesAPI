@@ -1,10 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using PartiesAPI.Data;
+using PartiesAPI.DTOMappers;
+using PartiesAPI.Services.EventService;
+using PartiesAPI.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddScoped<UserMapper>();
+builder.Services.AddScoped<EventMapper>();
+builder.Services.AddScoped<EventParticipantMapper>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
