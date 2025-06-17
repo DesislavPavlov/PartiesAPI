@@ -1,7 +1,7 @@
 # 🎉 Parties API  
 > A lightweight ASP.NET Core Web API for managing parties and their members.
 
-![Swagger Preview](assets/swagger-preview.gif) <!-- Replace with your actual GIF path -->
+![Swagger Preview](assets/swagger_preview.gif) <!-- Replace with your actual GIF path -->
 
 ---
 
